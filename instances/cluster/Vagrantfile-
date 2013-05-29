@@ -35,9 +35,7 @@ Vagrant::Config.run do |config|
   # an identifier, the second is the path on the guest to mount the
   # folder, and the third is the path on the host to the actual folder.
   # config.vm.share_folder "v-data", "/vagrant_data", "../data"
-    
-  #config.vm.share_folder "v-data", "/srv/data", "/home/adutta/devops_toolbox/data-dump", :nfs => true
-  
+
   # Enable provisioning with Puppet stand alone.  Puppet manifests
   # are contained in a directory path relative to this Vagrantfile.
   # You will need to create the manifests directory and a manifest in
@@ -98,60 +96,15 @@ Vagrant::Config.run do |config|
   # chef-validator, unless you changed the configuration.
   #
   #   chef.validation_client_name = "ORGNAME-validator"
-config.vm.define :web do |web_config|
-  web_config.vm.host_name = "web"
-  web_config.vm.network :hostonly, "10.10.10.10"
-  web_config.vm.forward_port 22, 2310
-  web_config.vm.forward_port 80, 8110
-
-  web_config.vm.provision :chef_solo do |chef|
-    chef.cookbooks_path = "../../chef/cookbooks"
-    chef.roles_path     = "../../chef/roles"
-    chef.add_role "web"
-    
-  chef.json = {
-    :myapp => {
-      :database => {
-        :name => "myapp",
-        :host => "10.10.10.11",
-        :user => "myapp",
-        :password => "myapp_1234"
-      },
-      :website => {
-        :server_name => "10.10.10.10",
-        :server_aliases => ["10.10.10.10"],
-        :rails_env => "development"
-      }
-    }
-  }
-  
+  config.vm.define :web do |web_config|
+    web_config.vm.host_name = "web"
+    web_config.vm.network :hostonly, "10.10.10.10"
+    web_config.vm.forward_port 22, 2210
   end
-end
 
-config.vm.define :db do |db_config|
-  db_config.vm.host_name = "db"                                                                                                            
-  db_config.vm.network :hostonly, "10.10.10.11"
-  db_config.vm.forward_port 22, 2211    
-
-  db_config.vm.provision :chef_solo do |chef|
-    chef.cookbooks_path = "../../chef/cookbooks"
-    chef.roles_path     = "../../chef/roles"
-    chef.add_role "db"
-
-	 chef.json = {
-    :mysql => {
-      :server_root_password => "abcd1234",
-      :server_repl_password => "abcd1234",
-      :server_debian_password =>  "abcd1234",
-      :bind_address => "10.10.10.11"
-    },
-    :myapp => {
-      :database => {
-        :password => 'myapp_1234'
-      }
-    }
-  }
+  config.vm.define :db do |db_config|
+    db_config.vm.host_name = "db"                                                                                                            
+    db_config.vm.network :hostonly, "10.10.10.11"
+    db_config.vm.forward_port 22, 2211    
   end
-end
-
 end
