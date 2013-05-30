@@ -52,7 +52,7 @@ end
 execute "unzip-site" do
  user "vagrant"
  cwd "/tmp"
- command "unzip master.zip" 
+ command "unzip -o master.zip" 
  action :run
 end
 
@@ -62,6 +62,12 @@ execute "load-db" do
  command "mysql -u#{node['myapp']['database']['user']} -p#{node['myapp']['database']['password']} -D #{node['myapp']['database']['name']} -h #{node['mysql']['bind_address']} < /tmp/my-website-master/#{node['myapp']['website']['dbpath']}"  
  action :run
 end
+
+#~ mysql_database "run script" do
+  #~ connection mysql_connection_info
+  #~ sql { ::File.open("/tmp/my-website-master/#{node['myapp']['website']['dbpath']}").read }
+  #~ action :query
+#~ end
 
 execute "remove-zip" do 
  user "vagrant"

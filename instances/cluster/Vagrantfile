@@ -98,15 +98,41 @@ Vagrant::Config.run do |config|
   # chef-validator, unless you changed the configuration.
   #
   #   chef.validation_client_name = "ORGNAME-validator"
+
 config.vm.define :web do |web_config|
   web_config.vm.host_name = "web"
   web_config.vm.network :hostonly, "10.10.10.10"
   web_config.vm.forward_port 22, 2310
   web_config.vm.forward_port 80, 8110
 
-  web_config.vm.provision :chef_solo do |chef|
-    chef.cookbooks_path = "../../chef/cookbooks"
-    chef.roles_path     = "../../chef/roles"
+#  local config
+#  web_config.vm.provision :chef_solo do |chef|
+#    chef.cookbooks_path = "../../chef/cookbooks"
+#    chef.roles_path     = "../../chef/roles"
+#    chef.add_role "web"
+    
+#  chef.json = {
+#    :myapp => {
+#      :database => {
+#        :name => "myapp",
+#        :host => "10.10.10.11",
+#        :user => "myapp",
+#        :password => "myapp_1234"
+#      },
+#      :website => {
+#        :server_name => "10.10.10.10",
+#        :server_aliases => ["10.10.10.10"],
+#        :rails_env => "development"
+#      }
+#    }
+#  }
+  
+#  chef server config
+  web_config.vm.provision :chef_client do |chef|
+    chef.chef_server_url = "https://api.opscode.com/organizations/amit-personal"
+    chef.validation_client_name = "amit-personal-validator"
+    chef.validation_key_path = "../../.chef/amit-personal-validator.pem"
+    chef.node_name = "vagrant-web"    
     chef.add_role "web"
     
   chef.json = {
@@ -125,6 +151,7 @@ config.vm.define :web do |web_config|
     }
   }
   
+  
   end
 end
 
@@ -133,9 +160,30 @@ config.vm.define :db do |db_config|
   db_config.vm.network :hostonly, "10.10.10.11"
   db_config.vm.forward_port 22, 2211    
 
-  db_config.vm.provision :chef_solo do |chef|
-    chef.cookbooks_path = "../../chef/cookbooks"
-    chef.roles_path     = "../../chef/roles"
+#  db_config.vm.provision :chef_solo do |chef|
+#    chef.cookbooks_path = "../../chef/cookbooks"
+#    chef.roles_path     = "../../chef/roles"
+#    chef.add_role "db"
+
+#	 chef.json = {
+#    :mysql => {
+#      :server_root_password => "abcd1234",
+#      :server_repl_password => "abcd1234",
+#     :server_debian_password =>  "abcd1234",
+#      :bind_address => "10.10.10.11"
+#    },
+#    :myapp => {
+#      :database => {
+#        :password => 'myapp_1234'
+#      }
+#    }
+#  }
+  
+  db_config.vm.provision :chef_client do |chef|
+    chef.chef_server_url = "https://api.opscode.com/organizations/amit-personal"
+    chef.validation_client_name = "amit-personal-validator"
+    chef.validation_key_path = "../../.chef/amit-personal-validator.pem"
+    chef.node_name = "vagrant-db" 
     chef.add_role "db"
 
 	 chef.json = {
@@ -150,7 +198,7 @@ config.vm.define :db do |db_config|
         :password => 'myapp_1234'
       }
     }
-  }
+  }  
   end
 end
 
